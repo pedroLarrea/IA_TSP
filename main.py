@@ -98,6 +98,7 @@ def generarPoblacionInicial():
 
 def calcularPareto():
     global paretoSet, poblacion, ciudades, tamanhoPoblacion 
+    print("Calculando Pareto...")
     for cromosoma in poblacion:
 
         costoTotal = 0
@@ -118,59 +119,70 @@ def calcularPareto():
             costoTotal = costoTotal + distancias[ciudadDestino].getCosto()
             tiempoTotal = tiempoTotal + distancias[ciudadDestino].getTiempo()
 
-        paretoSet.append([costoTotal,tiempoTotal])
+        cromosoma.append([costoTotal,tiempoTotal])
 
 def calcularFrentePareto():
-    global paretoSet,frentePareto,dominados
+    global paretoSet,frentePareto,dominados,poblacion
     frentePareto = []
     dominados = []
+    print("Calculando frente pareto...")
     # recorremos el pareto por indices
-    for paretoIndex in range( 0,len(paretoSet)):
+    for paretoIndex in range( 0,len(poblacion)):
         # bandera para saber si el pareto con indice paretoIndex no es dominado por otro pareto
         dominado = False
         # ciclo para probar con todos los paretos 
-        for paretoIndexAux in range( 0,len(paretoSet)):
-            pi = paretoSet[paretoIndex]
-            pj = paretoSet[paretoIndexAux]
+        for paretoIndexAux in range( 0,len(poblacion)):
+            pi = poblacion[paretoIndex]
+            pj = poblacion[paretoIndexAux]
             # condicion de dominando del pj sobre pi, problema de minimizacion
-            if pj[0] <= pi[0] and pj[1] <= pi[1] and ( pj[0] < pi[0] or pj[1] < pi[1]) :
+            if pj[-1][0] <= pi[-1][0] and pj[-1][1] <= pi[-1][1] and ( pj[-1][0] < pi[-1][0] or pj[-1][1] < pi[-1][1]) :
                 dominado = True
                 break
         # si pareto con indice paretoIndex no es dominado, se agreg al frente pareto
         if not dominado:
-            frentePareto.append(paretoSet[paretoIndex])
+            frentePareto.append(poblacion[paretoIndex])
         else:
-            dominados.append(paretoSet[paretoIndex])
+            dominados.append(poblacion[paretoIndex])
 
 def calcularFitness():
-    global frentePareto
-    
+    global frentePareto,poblacion
+    print("Calculando fitness...")
     # calculamos fitness para frente pareto
-    print("Fitness (Frente Pareto): ")
+
+    # se va a recrear la poblacion con la mezcla de el frente pareto y los no dominados a fin de tener todos los en una sola estructura
+    poblacion = []
+
     for frenteParetoInd in range(0,len(frentePareto)):
         count = 0
         for popInd in dominados:
             # verificamos si el elemento del frente pareto cubre a popInd
-            if frentePareto[frenteParetoInd][0] <= popInd[0] and frentePareto[frenteParetoInd][1] <= popInd[1]:
+            if frentePareto[frenteParetoInd][-1][0] <= popInd[-1][0] and frentePareto[frenteParetoInd][-1][1] <= popInd[-1][1]:
                 count += 1
         strength = count / (len(dominados) + 1)
         frentePareto[frenteParetoInd].append(strength)
-        print(strength)
+        # se carga en la poblacion
+        poblacion.append(frentePareto[frenteParetoInd])
 
-    print("Paretos Dominados: ")
     # calculamos el fitness para los dominados
     for dominadoInd in range(0,len(dominados)):
         sum = 0
         for popInd in frentePareto:
             # verificamos si el elemento del frente pareto cubre al elemento dominado
-            if dominados[dominadoInd][0] >= popInd[0] and dominados[dominadoInd][1] >= popInd[1]:
-                sum += popInd[2]
+            if dominados[dominadoInd][-1][0] >= popInd[-2][0] and dominados[dominadoInd][-1][1] >= popInd[-2][1]:
+                sum += popInd[-1]
         strength = sum + 1
         dominados[dominadoInd].append(strength)
-        print(strength) 
+        # se carga en la poblacion
+        poblacion.append(dominados[dominadoInd])
+
+# def seleccion():
+    # 40% por el metodo elitista
+
+    # 60% por mutacion
+    
 
 def imprimirCiudades():
-    print("Numero de ciudades:")
+    print("Lista de ciudades iudades:")
     global ciudades
     print("[")
     
@@ -183,55 +195,37 @@ def imprimirCiudades():
         print("]")
     print("]")
 
-def imprimirPoblacion():
+def imprimirPoblacion(titulo):
     global poblacion
-    print("Poblacion actual:")
+    print(titulo)
     print("[")
     for cromosoma in poblacion:
         print("[",end="")
         for gen in cromosoma:
             print(gen,end=",")
         print("]")
-    print("]")
-
-def imprimirPareto():
-    global paretoSet
-    print("ParetoSet:")
-    print("[")
-    for pareto in paretoSet:
-        print("[",end="")
-        for resultado in pareto:
-            print(resultado,end=",")
-        print("]")
-    print("]")            
-
-def imprimirFrentePareto():
-    global frentePareto
-    print("Frente pareto:")
-    print("[")
-    for pareto in frentePareto:
-        print("[",end="")
-        for resultado in pareto:
-            print(resultado,end=",")
-        print("]")
-    print("]")        
+    print("]") 
 
 # 1er paso introducir parametros
 parametros()
+
 # 2do paseo: generación automatica de ciudades, costos y tiempo
 generarCiudades()
 imprimirCiudades()
+
 # se genera problacion inicial
 generarPoblacionInicial()
-imprimirPoblacion()
-# Calculamos el pareto de los cromosoma
+imprimirPoblacion("Poblacion Inicial")
+
+# Calculamos el pareto de los cromosoma (suma de costos y tiempo de cada cromosoma)
 calcularPareto()
-imprimirPareto()
-# calcu8lamos el frente pareto (cromosomas no dominados)
-#calcularFrentePareto()
-#imprimirFrentePareto()
+
+# calculamos el frente pareto (paretos no dominados)
+calcularFrentePareto()
+
 # calculasmos el fitness para el siguiente paso genetico
-# calcularFitness()
+calcularFitness()
+imprimirPoblacion("Poblacion con pareto y fitness:")
 
 '''for iteracion in range(0,iteraciones):
     print("Iteración:",iteracion)
