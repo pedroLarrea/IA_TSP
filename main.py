@@ -1,5 +1,7 @@
 import random
 import numpy as np
+import sys
+
 
 class Ciudad:
     # Una ciudad puede tener costo y tiempo
@@ -58,13 +60,13 @@ iteraciones = 1
 '''
 
 def parametros():
-    global nroCiudades,maxCosto,maxTiempo,tamanhoPoblacion
+    global nroCiudades,maxCosto,maxTiempo,tamanhoPoblacion,iteraciones
     
     print ("Introduce el numero de ciudades:")
     nroCiudades = int(input()) + 1
-    print ("Introduce costo maxima entre ciudades:")
+    print ("Introduce costo maximo entre ciudades:")
     maxCosto = int(input())
-    print ("Introduce tiempoo maximo entre ciudades:")
+    print ("Introduce tiempo maximo entre ciudades:")
     maxTiempo = int(input())
     print ("Introduce el tamaño de la poblacion:")
     tamanhoPoblacion = int(input())
@@ -241,42 +243,43 @@ def mutacion():
     rand1 = 0
     rand2 = 0
     for c in poblacion:
-        rand1 = rand2 = random.randint(0, nroCiudades-1)
+        rand1 = rand2 = random.randint(1, nroCiudades-1)
         while(rand1 == rand2):
-            rand2 = random.randint(0, nroCiudades-1)
+            rand2 = random.randint(1, nroCiudades-1)
         #Invertimos lugares para generar la mutacion
         aux = c[rand1]
         c[rand1] = c[rand2]
         c[rand2] = aux
-    calcularPareto()
+    '''calcularPareto()
     calcularFrentePareto()
-    calcularFitness()
+    calcularFitness()'''
 
-def eliminarUltimasColumnas():
-    global poblacion
+def eliminarUltimasColumnas(target):
     #Eliminamos sumatoria de costo y tiempo viejo, y fitness
-    for c in poblacion:
+    for c in target:
         c.pop(-1)
         c.pop(-1)
         
 # 1er paso introducir parametros
 parametros()
+
+# Archivo para exportar la salida
+path = 'SPEA.txt'
+sys.stdout = open(path, 'w')
+
 # 2do paseo: generación automatica de ciudades, costos y tiempo
 generarCiudades()
 imprimirCiudades()
 
 # se genera problacion inicial
 generarPoblacionInicial()
-imprimirPoblacion("Poblacion Inicial")
+# imprimirPoblacion("Poblacion Inicial")
 i = 0
 while(i<=iteraciones): 
     print("##############################################################################")
     print("                             ITERACION ", i+1,"                               ")
     print("##############################################################################")
     
-    if(i>=1):
-        eliminarUltimasColumnas()
-        
     imprimirPoblacion("La poblacion es:")
     # Calculamos el pareto de los cromosoma (suma de costos y tiempo de cada cromosoma)
     calcularPareto()
@@ -285,18 +288,16 @@ while(i<=iteraciones):
 
     # calculasmos el fitness para el siguiente paso genetico
     calcularFitness()
-    imprimirPoblacion("Poblacion con pareto y fitness:")
+    # imprimirPoblacion("Poblacion con pareto y fitness:")
     poblacion = sorted(poblacion, key=lambda x: x[-1])
     imprimirPoblacion("Poblacion Ordenada con pareto y fitness:")
     elitista()
-    eliminarUltimasColumnas()
+    eliminarUltimasColumnas(poblacion)
     mutacion()
+    eliminarUltimasColumnas(proximaPoblacion)
     #Se unen valores formados por la estrategia elitista y mutacion
     poblacion = proximaPoblacion + poblacion
     proximaPoblacion = []
     i = i+1
-    '''for iteracion in range(0,iteraciones):
-        print("Iteración:",iteracion)
-    '''
     imprimirPoblacion("La poblacion final es:")
     
