@@ -261,7 +261,11 @@ def mutacion():
     '''calcularPareto()
     calcularFrentePareto()
     calcularFitness()'''
-
+def invertirFitness():
+    global poblacion
+    for c in poblacion:
+        c[-1] = 1 / c[-1]
+    
 def eliminarUltimasColumnas(target):
     #Eliminamos sumatoria de costo y tiempo viejo, y fitness
     for c in target:
@@ -296,6 +300,7 @@ while(i<=iteraciones):
 
     # calculasmos el fitness para el siguiente paso genetico
     calcularFitness()
+    invertirFitness()
     # imprimirPoblacion("Poblacion con pareto y fitness:")
     poblacion = sorted(poblacion, key=lambda x: x[-1])
     imprimirPoblacion("Poblacion Ordenada con pareto y fitness:")
