@@ -33,6 +33,7 @@ class Ciudad:
 nroCiudades = 0
 maxCosto = 0
 maxTiempo = 0
+mejorSolucion = [[99999999999999999999999999,99999999999999999999999999]]
 ciudades = []
 
 # Datos sobre la poblacion
@@ -127,7 +128,7 @@ def calcularPareto():
         cromosoma.append([costoTotal,tiempoTotal])
 
 def calcularFrentePareto():
-    global paretoSet, frentePareto, dominados, poblacion
+    global paretoSet, frentePareto, dominados, poblacion, mejorSolucion
     frentePareto = []
     dominados = []
     print("Calculando frente pareto...")
@@ -146,6 +147,8 @@ def calcularFrentePareto():
         # si pareto con indice paretoIndex no es dominado, se agreg al frente pareto
         if not dominado:
             frentePareto.append(poblacion[paretoIndex])
+            if(poblacion[paretoIndex][-1][0]<mejorSolucion[-1][0] or poblacion[paretoIndex][-1][1]<mejorSolucion[-1][1]):
+                mejorSolucion = list(poblacion[paretoIndex])
         else:
             dominados.append(poblacion[paretoIndex])
 
@@ -264,7 +267,8 @@ def mutacion():
 def invertirFitness():
     global poblacion
     for c in poblacion:
-        c[-1] = 1 / c[-1]
+        if(c[-1] != 0):
+            c[-1] = 1 / c[-1]
     
 def eliminarUltimasColumnas(target):
     #Eliminamos sumatoria de costo y tiempo viejo, y fitness
@@ -313,4 +317,5 @@ while(i<=iteraciones):
     proximaPoblacion = []
     i = i+1
     imprimirPoblacion("La poblacion final es:")
+    print("La mejor solucion: ", mejorSolucion)
     
