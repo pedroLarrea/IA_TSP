@@ -221,8 +221,6 @@ def elitista():
     elegidos = []
     sumatoria = sumaColumna(poblacion, -1)
     target = round(random.uniform(0.00, sumatoria), 15)
-    print(sumatoria)
-    print(target)
     inicial = 0
     for c in poblacionAux:
         inicial += c[-1]
@@ -261,7 +259,6 @@ def eliminarUltimasColumnas():
         c.pop(-1)
         c.pop(-1)
         
-        
 # 1er paso introducir parametros
 parametros()
 # 2do paseo: generación automatica de ciudades, costos y tiempo
@@ -273,14 +270,14 @@ generarPoblacionInicial()
 imprimirPoblacion("Poblacion Inicial")
 i = 0
 while(i<=iteraciones): 
-    print("#####################################################")
-    print("ITERACION ", i+1)
-    print("#####################################################")
+    print("##############################################################################")
+    print("                             ITERACION ", i+1,"                               ")
+    print("##############################################################################")
     
-    imprimirPoblacion("La poblacion es:")
-    
-    if(i>1):
+    if(i>=1):
         eliminarUltimasColumnas()
+        
+    imprimirPoblacion("La poblacion es:")
     # Calculamos el pareto de los cromosoma (suma de costos y tiempo de cada cromosoma)
     calcularPareto()
     # calculamos el frente pareto (paretos no dominados)
@@ -301,4 +298,5 @@ while(i<=iteraciones):
     '''for iteracion in range(0,iteraciones):
         print("Iteración:",iteracion)
     '''
+    imprimirPoblacion("La poblacion final es:")
     
