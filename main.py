@@ -1,4 +1,5 @@
 import random
+import math
 import numpy as np
 import sys
 
@@ -219,20 +220,27 @@ def imprimirPoblacion(titulo):
 
 def elitista():
     global poblacion, proximaPoblacion
+    porcentajeElitista = 0.4
+    cantElementElitista = math.ceil(porcentajeElitista*len(poblacion))
     poblacionAux = poblacion
     elegidos = []
     sumatoria = sumaColumna(poblacion, -1)
     target = round(random.uniform(0.00, sumatoria), 15)
+    limite = 100
     inicial = 0
-    for c in poblacionAux:
-        inicial += c[-1]
-        if(inicial >= target):
-            elegidos.append(c)
-            inicial -= c[-1]
-            #Analizar si el ciclo sigue sin problemas
-            poblacionAux.remove(c)
-            sumatoria = sumaColumna(poblacionAux, -1)
-            target = round(random.uniform(0.00, sumatoria), 15)
+    loop=0
+    while(len(elegidos)<cantElementElitista and loop<limite):
+        for c in poblacionAux:
+            inicial += c[-1]
+            if(inicial >= target):
+                elegidos.append(c)
+                inicial -= c[-1]
+                #Analizar si el ciclo sigue sin problemas
+                poblacionAux.remove(c)
+                sumatoria = sumaColumna(poblacionAux, -1)
+                target = round(random.uniform(0.00, sumatoria), 15)
+                break
+        loop=loop+1
     print("Cant. de poblacion elegida por Elitista ", len(elegidos))
     print("Cant. de poblacion a mutar ", len(poblacionAux))
     poblacion = poblacionAux
