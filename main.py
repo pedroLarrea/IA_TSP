@@ -147,11 +147,12 @@ def calcularFrentePareto():
         # si pareto con indice paretoIndex no es dominado, se agreg al frente pareto
         if not dominado:
             frentePareto.append(poblacion[paretoIndex])
-            if(poblacion[paretoIndex][-1][0]<mejorSolucion[-1][0] or poblacion[paretoIndex][-1][1]<mejorSolucion[-1][1]):
+            if(poblacion[paretoIndex][-1][1]<mejorSolucion[-1][1] or poblacion[paretoIndex][-1][0]<mejorSolucion[-1][0]):
                 mejorSolucion = list(poblacion[paretoIndex])
         else:
             dominados.append(poblacion[paretoIndex])
-
+    imprimirPoblacion(frentePareto, "La mejores soluciones de esta iteracion son: ") 
+    
 def calcularFitness():
     global frentePareto, poblacion
     print("Calculando fitness...")
@@ -210,8 +211,7 @@ def imprimirCiudades():
         print("]")
     print("]")
 
-def imprimirPoblacion(titulo):
-    global poblacion
+def imprimirPoblacion(poblacion, titulo):
     print(titulo)
     print("[")
     for cromosoma in poblacion:
@@ -296,7 +296,7 @@ while(i<=iteraciones):
     print("                             ITERACION ", i+1,"                               ")
     print("##############################################################################")
     
-    imprimirPoblacion("La poblacion es:")
+    imprimirPoblacion(poblacion,"La poblacion es:")
     # Calculamos el pareto de los cromosoma (suma de costos y tiempo de cada cromosoma)
     calcularPareto()
     # calculamos el frente pareto (paretos no dominados)
@@ -307,7 +307,7 @@ while(i<=iteraciones):
     invertirFitness()
     # imprimirPoblacion("Poblacion con pareto y fitness:")
     poblacion = sorted(poblacion, key=lambda x: x[-1])
-    imprimirPoblacion("Poblacion Ordenada con pareto y fitness:")
+    imprimirPoblacion(poblacion, "Poblacion Ordenada con pareto y fitness:")
     elitista()
     eliminarUltimasColumnas(poblacion)
     mutacion()
@@ -316,6 +316,6 @@ while(i<=iteraciones):
     poblacion = proximaPoblacion + poblacion
     proximaPoblacion = []
     i = i+1
-    imprimirPoblacion("La poblacion final es:")
+    imprimirPoblacion(poblacion,"La poblacion final es:")
     print("La mejor solucion: ", mejorSolucion)
     
